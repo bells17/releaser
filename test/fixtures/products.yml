@@ -1,0 +1,47 @@
+# == Schema Information
+#
+# Table name: products
+#
+#  id             :integer          not null, primary key
+#  asin           :string(255)
+#  isbn           :string(255)
+#  title          :string(255)
+#  binding        :string(255)
+#  product_url    :text(65535)
+#  image_small    :text(65535)
+#  image_medium   :text(65535)
+#  image_large    :text(65535)
+#  price          :decimal(20, 6)
+#  price_currency :string(255)
+#  group          :string(255)
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  asin: MyString
+  isbn: MyString
+  title: MyString
+  binding: MyString
+  product_url: MyText
+  image_small: MyText
+  image_medium: MyText
+  image_large: MyText
+  price: 9.99
+  price_currency: MyString
+  group: MyString
+
+two:
+  asin: MyString
+  isbn: MyString
+  title: MyString
+  binding: MyString
+  product_url: MyText
+  image_small: MyText
+  image_medium: MyText
+  image_large: MyText
+  price: 9.99
+  price_currency: MyString
+  group: MyString

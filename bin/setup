@@ -10,7 +10,7 @@ Dir.chdir APP_ROOT do
 
   puts "== Installing dependencies =="
   system "gem install bundler --conservative"
-  system "bundle check || bundle install"
+  system "bundle check || bundle install --path vendor/bundler"
 
   # puts "\n== Copying sample files =="
   # unless File.exist?("config/database.yml")
@@ -23,6 +23,10 @@ Dir.chdir APP_ROOT do
   puts "\n== Removing old logs and tempfiles =="
   system "rm -f log/*"
   system "rm -rf tmp/cache"
+
+  puts "\n== Initialize"
+  system "mkdir -p tmp/files"
+  system "mkdir -p log/tasks"
 
   puts "\n== Restarting application server =="
   system "touch tmp/restart.txt"

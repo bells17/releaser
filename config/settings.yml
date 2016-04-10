@@ -1,7 +1,16 @@
 defaults: &defaults
-  twitter:
-    consumer_key: <%= ENV['TWITTER_CONSUMER_KEY'] %>
-    consumer_secret: <%= ENV['TWITTER_CONSUMER_SECRET'] %>
+  api:
+    twitter:
+      consumer_key: <%= ENV["TWITTER_CONSUMER_KEY"] %>
+      consumer_secret: <%= ENV["TWITTER_CONSUMER_SECRET"] %>
+    amazon:
+      access_key_id: <%= ENV["AWS_ACCESS_KEY_ID"] %>
+      sercret_access_key: <%= ENV["AWS_SERCRET_ACCESS_KEY"] %>
+      associate_tag: <%= ENV["AMAZON_ASSOCIATE_TAG"] %>
+  path:
+    tmp: <%= "#{Rails.root}/tmp" %>
+    tmp_files: <%= "#{Rails.root}/tmp/files" %>
+    task_logs: <%= "#{Rails.root}/log/tasks" %>
 
 development:
   <<: *defaults
