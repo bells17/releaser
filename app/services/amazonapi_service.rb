@@ -1,5 +1,6 @@
 class AmazonapiService
   def initialize(params)
+    @logger = params.logger
     @access_key_id = params.access_key_id
     @sercret_access_key = params.sercret_access_key
     @associate_tag = params.associate_tag
@@ -11,9 +12,7 @@ class AmazonapiService
       xml = Amazon::Ecs::Response.new(File.open(path))
     else
       xml = item_search_to_file(path, keyword, opts)
-      if xml != true
-        return xml
-      end
+      return [] if xml.nil? or xml.items.nil?
     end
     parse_items_from_xml(xml)
   end
