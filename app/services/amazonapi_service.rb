@@ -17,6 +17,54 @@ class AmazonapiService
     parse_items_from_xml(xml)
   end
 
+  private
+  def default_api_opts
+    {
+      :AWS_access_key_id => @access_key_id,
+      :AWS_secret_key => @sercret_access_key,
+      :associate_tag => @associate_tag,
+      :country => 'jp'
+    }
+  end
+
+  def file_path(file_name)
+    "#{Settings.path.tmp_files}/#{file_name}"
+  end
+
+  # item_search api の検索結果をファイルに保存します
+  # @param [String] path      ファイルパス
+  # @param [String] keyword   検索キーワード
+  # @param [Hash]   opts      クエリオプション
+  # @raise [SystemCallError, IOError]   ファイル書き込みが失敗した場合
+  # @raise [Amazon::RequestError]       Amazon の API へのリクエストが失敗した場合
+  # @return [String]  Amazon の API からエラーが返った場合はエラーメッセージ
+  # @return [nil]     成功の場合はnil
+  def item_search_to_file(path, keyword, opts = {})
+    res = item_search(keyword, opts)
+    if res.has_error?
+      return res.error
+    end
+    File.open(path, "w") do |file|
+      file.puts res.doc.to_xml
+    end
+    return res
+  end
+
+  # item_search api をコールする 一定回数失敗したら例外を投げる
+  def item_search(keyword, opts = {})
+    res = nil
+    Retryable.retryable(:tries => 3, :sleep => 1, :on => Amazon::RequestError) do
+      res = Amazon::Ecs.item_search(keyword, default_api_opts.merge(opts))
+    end
+    return res
+  end
+
+  def parse_items_from_xml(xml)
+    xml.items.map do |item|
+      Item.new(item)
+    end
+  end
+
   class Item
     attr  :title,
           :asin,
@@ -76,54 +124,6 @@ class AmazonapiService
         end
         append_to_parent({}, node)
       }).call
-    end
-  end
-
-  private
-  def default_api_opts
-    {
-      :AWS_access_key_id => @access_key_id,
-      :AWS_secret_key => @sercret_access_key,
-      :associate_tag => @associate_tag,
-      :country => 'jp'
-    }
-  end
-
-  def file_path(file_name)
-    "#{Settings.path.tmp_files}/#{file_name}"
-  end
-
-  # item_search api の検索結果をファイルに保存します
-  # @param [String] path      ファイルパス
-  # @param [String] keyword   検索キーワード
-  # @param [Hash]   opts      クエリオプション
-  # @raise [SystemCallError, IOError]   ファイル書き込みが失敗した場合
-  # @raise [Amazon::RequestError]       Amazon の API へのリクエストが失敗した場合
-  # @return [String]  Amazon の API からエラーが返った場合はエラーメッセージ
-  # @return [nil]     成功の場合はnil
-  def item_search_to_file(path, keyword, opts = {})
-    res = item_search(keyword, opts)
-    if res.has_error?
-      return res.error
-    end
-    File.open(path, "w") do |file|
-      file.puts res.doc.to_xml
-    end
-    return res
-  end
-
-  # item_search api をコールする 一定回数失敗したら例外を投げる
-  def item_search(keyword, opts = {})
-    res = nil
-    Retryable.retryable(:tries => 3, :sleep => 1, :on => Amazon::RequestError) do
-      res = Amazon::Ecs.item_search(keyword, default_api_opts.merge(opts))
-    end
-    return res
-  end
-
-  def parse_items_from_xml(xml)
-    xml.items.map do |item|
-      Item.new(item)
     end
   end
 
