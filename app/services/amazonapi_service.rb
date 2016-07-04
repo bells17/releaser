@@ -1,13 +1,29 @@
 class AmazonapiService
-  def initialize(params)
-    @logger = params.logger
+  def initialize(params, logger)
+    @logger = logger
     @access_key_id = params.access_key_id
     @sercret_access_key = params.sercret_access_key
     @associate_tag = params.associate_tag
   end
 
-  def items_from_item_search(file_name, keyword, opts = {})
-    path = file_path(file_name)
+  def fetch_items(file, keyword, opts)
+    today = Date.today.strftime("%Y%m%d")
+    @logger.info "AmazonapiService fetch_items called: File: #{file} Keyword: '#{keyword}' opts: #{opts.to_s}"
+    (1..10).each do |page|
+      @logger.info "Date: #{today} Page: #{page} start"
+      items = items_from_item_search("#{file}-#{today}-#{page}.xml", keyword, opts.merge({
+        :item_page => page,
+        :sort => "daterank"
+      }))
+      items.each do |item|
+        product_regist_service = ProductRegistService.new(item)
+        product_regist_service.regist
+      end        
+    end
+  end
+
+  def items_from_item_search(file, keyword, opts = {})
+    path = file_path(file)
     if File.exist?(path)
       xml = Amazon::Ecs::Response.new(File.open(path))
     else
@@ -27,8 +43,8 @@ class AmazonapiService
     }
   end
 
-  def file_path(file_name)
-    "#{Settings.path.tmp_files}/#{file_name}"
+  def file_path(file)
+    "#{Settings.path.tmp_files}/#{file}"
   end
 
   # item_search api の検索結果をファイルに保存します
