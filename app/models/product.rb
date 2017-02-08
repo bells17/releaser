@@ -19,4 +19,8 @@
 #
 
 class Product < ActiveRecord::Base
+  # アプリケーションのテーブルに表示するカラム一覧
+  def self.display_columns
+    [ "title", "price", "price_currency" ]
+  end
 end

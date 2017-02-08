@@ -1,0 +1,35 @@
+<h1>Product#index</h1>
+
+<h2>Product List</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <% Product.display_columns.each do |column| %>
+      <th><%= column %></th>
+      <% end %>
+    </tr>
+  </thead>
+  <tbody>
+
+    <% @products.each do |product| %>
+    <tr>
+      <td><a href='<%= "/products/#{product.id}" %>'><%= product.id %></td></a>
+      <% Product.display_columns.each do |column| %>
+      <td><%= product[column] %></td>
+      <% end %>
+    </tr>
+    <% end %>
+
+  </tbody>
+</table>
+
+<div>
+  <p>
+    <a href='<%= "/products?page=#{@page-1}" %>' >prev</a>
+  </p>
+  <p>
+    <a href='<%= "/products?page=#{@page+1}" %>' >next</a>
+  </p>
+</div>
